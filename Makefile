@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-CC = clang
+CC = gcc
 CFLAGS = -Wall -Wextra -std=c99 -fopenmp
 SOURCES = char_count.c
 OBJECTS = $(subst .c,.o,$(SOURCES))

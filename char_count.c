@@ -16,27 +16,35 @@ typedef struct{
 
 
 int char_search(char c);
+int char_replace(char *old_c, char new_c);
 void replace_insert(replace_table_t **table, char* prev_string, char* new_string);
 
 char **character;
+char **replace_character;
+char **string_array;
 int length = 0;
+int replace_length = 0;
 int table_size = 0;
+int total_words = 0;
 
 int main(int argc, char *argv[]){
+	(void)argc;
+	(void)argv;
 	replace_table_t *table;
 	FILE *fp_input, *fp_replace;
 	char string[256];
-	char *final_string, *temp_char, *token;
+	char *final_string, *temp_char, *token, *temp_final_string;
 	char *prev_string = NULL;
 	char *new_string = NULL;
-	int replace = 1;
 	int total_length = 0;
 	
 	
 
-	character = malloc(0);
-	final_string = malloc(0);
-	table = malloc(0);
+	character = NULL;
+	replace_character = NULL;
+	final_string = NULL;
+	table = NULL;
+	string_array = NULL;
 
 	// if(argc < 2){
 	// 	fprintf(stderr, "Not enought arguments\n");
@@ -52,7 +60,6 @@ int main(int argc, char *argv[]){
 	// reading replace file and putting it into a table
 	fp_replace = fopen("replace", "r");
 	if(fp_replace){
-		replace = 0;
 		while(fgets(string, 256, fp_replace) != NULL){
 			prev_string = strtok(string, " \n");
 			new_string = strtok(NULL, " \n");		
@@ -72,14 +79,29 @@ int main(int argc, char *argv[]){
 		strcat(final_string, string);
 	}
 
-	printf("%s\n", final_string);
+	// copies the string so that the final string is not affected
+	temp_final_string = malloc(sizeof(char) * strlen(final_string));
+	strcpy(temp_final_string, final_string);
+
+	// seperates words into another array
+	token = strtok(temp_final_string, " \n\r\t");
+	while(token){
+		total_words++;
+		string_array = realloc(string_array, sizeof(char*) * total_words);
+		string_array[total_words - 1] = malloc(sizeof(char) * strlen(token));
+		strcpy(string_array[total_words - 1], token);
+		token = strtok(NULL, " \n\r\t");
+	}
 
 	for(int i = 0; i < total_length; i++){
 		char_search(final_string[i]);
-		if(replace == 0){
-
-		}
 	}
+
+	if(fp_replace){
+
+		char_replace(&final_string[i]);
+	}
+	printf("%s\n", final_string);
 
 	for(int i = 0; i < length; i++){
 		printf("%c: %d\n", character[i][0], character[i][1]);
@@ -87,6 +109,8 @@ int main(int argc, char *argv[]){
 
 	fclose(fp_input);
 }
+
+
 
 int char_search(char c){
 	char *inner_array;
@@ -109,9 +133,19 @@ int char_search(char c){
 	return 1;
 }
 
+int char_replace(char *c, replace_table_t *table){
+	if(*c == '\n' || *c == '\r' || *c == ' '){
+		return 1;
+	}
+	for(int i = 0; i < table_size; i++){
+		for(int j = 0)
+	}
+
+	return 1;
+}
+
 void replace_insert(replace_table_t **table, char* prev_string, char* new_string){
 	replace_table_t *temp_table;
-	int prev_string_length, new_string_length;
 
 	temp_table = *table;
 	temp_table = realloc(temp_table, sizeof(replace_table_t) * (table_size + 1));
