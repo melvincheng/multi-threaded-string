@@ -3,6 +3,8 @@
 #include <string.h>
 #include <omp.h>
 
+#define THREAD 1
+
 
 typedef struct{
 	char c;
@@ -169,24 +171,19 @@ int main(int argc, char *argv[]){
 	// 	printf("%s\n", string_array[i]);
 	// }
 
-	// printf("Before replacements\n");
-	// printf("-----\n");
-	// for(int i = 0; i < total_words; i++){
-	// 	printf("%s", string_array[i]);
-	// }
-	// printf("-----\n\n");
+	printf("Before replacements\n");
+	printf("-----\n");
+	for(int i = 0; i < total_length; i++){
+		printf("%s", final_string[i]);
+	}
+	printf("-----\n\n");
 
 
 	// count characters
-	#pragma omp parallel num_threads(100)
+	omp_set_num_threads(THREAD);
+	#pragma omp parallel
 	{
 		#pragma omp for
-		// #pragma omp parallel for num_threads(1)
-		// for(int i = 0; i < total_length; i++){
-		// 	for(int j = 0; j < strlen(final_string[i]); j++){
-		// 		char_search(final_string[i][j]);
-		// 	}
-		// }
 		for(int i = 0; i < total_length; i++){
 			for(int j = 0; j < strlen(final_string[i]); j++){
 				char_search(final_string[i][j]);
@@ -198,31 +195,33 @@ int main(int argc, char *argv[]){
 		for(int i = 0; i < total_length; i++){
 			word_replace(final_string[i], table);
 		}
+		// char count
+		printf("Character count\n");
+		printf("-----\n");
+		#pragma omp for
+		for(int i = 0; i < length; i++){
+			printf("%c: %d\n", character[i].c, character[i].count);
+		}
+		printf("-----\n\n");
+
+
+		// word count
+		printf("Word count\n");
+		printf("-----\n");
+		#pragma omp for
+		for(int i = 0; i < string_count_length; i++){
+			printf("%s: %d\n", words[i].string, words[i].count);
+		}
+		printf("-----\n\n");
 	}
 
-	// char count
-	printf("Character count\n");
+
+
+	printf("After replacements\n");
 	printf("-----\n");
-	for(int i = 0; i < length; i++){
-		printf("%c: %d\n", character[i].c, character[i].count);
+	for(int i = 0; i < total_length; i++){
+		printf("%s", final_string[i]);
 	}
-	printf("-----\n\n");
-
-
-	// word count
-	printf("Word count\n");
-	printf("-----\n");
-	for(int i = 0; i < string_count_length; i++){
-		printf("%s: %d\n", words[i].string, words[i].count);
-	}
-	printf("-----\n\n");
-
-
-	// printf("After replacements\n");
-	// printf("-----\n");
-	// for(int i = 0; i < total_words; i++){
-	// 	printf("%s", string_array[i]);
-	// }
 
 	fclose(fp_input);
 }
